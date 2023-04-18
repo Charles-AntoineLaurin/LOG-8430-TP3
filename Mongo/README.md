@@ -123,7 +123,8 @@ done
 
 # Reset des containers
 Une fois les manipulations réalisées, on peut shutdown la base de données en allant dans le répertoire où se trouve le docker-compose.yml et exécuté la commande suivante
-```docker-compose down
+```
+docker-compose down
 ```
 
 
