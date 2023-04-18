@@ -22,15 +22,15 @@ sudo usermod -aG docker ${USER}
 ```
 **Un redémarage est nécessaire pour que les modifications soient appliquées**
 
-Pour finir l'installation, il suffit d'installer docker-compose et YSCB comme suit :
+Pour finir l'installation, il suffit d'installer docker-compose et YCSB comme suit :
 ```
 # install docker-compose
 sudo curl -L "https://github.com/docker/compose/release/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
 
-#install YSCB
+#install YCSB
 sudo curl -O --location https://github.com/brianfrankcooper/YCSB/releases/download/0.17.0/ycsb-0.17.0.tar.gz
-tar xfvz ycsb-0.17.0.tar.gz -C ./YSCB
+tar xfvz ycsb-0.17.0.tar.gz -C ./YCSB
 rm ycsb-0.17.0.tar.gz
 ```
 
@@ -41,7 +41,7 @@ Cette section portera sur le déploiment de la base de données MongoDB grâce �
 # Téléchargement du docker-compose.yml utilisé pour initialisé la base de données
 mkdir database
 cd database
-sudo curl https://raw.githubusercontent.com/markbekhet/DB-TP3-LOG8430E/main/Mongo/docker-compose.yml -o docker-compose.yml
+sudo curl https://raw.githubusercontent.com/Charles-AntoineLaurin/LOG-8430-TP3/main/Mongo/docker-compose.yml -o docker-compose.yml
 
 # Mise en service de la base de données
 docker-compose up
@@ -85,7 +85,7 @@ Avec l'éditeur de votre choix (Nano, vim, ...), modifier le fichier /etc/hosts 
 Cette section portera sur les étapes à suivre pour réaliser les tests de charges.
 
 ```
-cd YSCB
+cd YCSB
 mkdir results
 
 # Création des dossiers pour la sauvegarde des données
