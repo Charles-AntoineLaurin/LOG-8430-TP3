@@ -34,7 +34,7 @@ sudo usermod -aG docker ${USER}
 Pour finir l'installation, il suffit d'installer docker-compose et YCSB comme suit :
 ```
 # install docker-compose
-sudo curl -L "https://github.com/docker/compose/release/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
 
 #install YCSB
