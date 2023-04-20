@@ -7,10 +7,10 @@ sudo apt-get update
 sudo apt update 
 
 # install Git
-sudo apt install git
+sudo apt install git -y
 
 # install C
-sudo apt install build-essential
+sudo apt install build-essential -y
 
 #install Python
 sudo apt install python2.7
