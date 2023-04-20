@@ -6,6 +6,15 @@ Il faut tout d'abord installer java, maven et docker comme suit :
 sudo apt-get update
 sudo apt update 
 
+# install Git
+sudo apt install git
+
+# install C
+sudo apt install build-essential
+
+#install Python
+sudo apt install python2.7
+
 # install Java
 sudo apt install default-jre -y
 sudo apt install default-jdk -y
@@ -38,12 +47,11 @@ rm ycsb-0.17.0.tar.gz
 Cette section portera sur le déploiment de la base de données MongoDB grâce à Docker.
 
 ```
-# Téléchargement du docker-compose.yml utilisé pour initialisé la base de données
-mkdir database
-cd database
-sudo curl https://raw.githubusercontent.com/Charles-AntoineLaurin/LOG-8430-TP3/main/Mongo/docker-compose.yml -o docker-compose.yml
+# Téléchargement du code source
+git clone https://github.com/Charles-AntoineLaurin/LOG-8430-TP3.git
 
 # Mise en service de la base de données
+cd Mongo
 docker-compose up
 docker exec -it primary mongosh --eval "rs.initiate(
     {
@@ -80,51 +88,44 @@ Avec l'éditeur de votre choix (Nano, vim, ...), modifier le fichier /etc/hosts 
 192.168.5.5 secondary3
 ```
 
-
 # Phase de tests
 Cette section portera sur les étapes à suivre pour réaliser les tests de charges.
 
 ```
-cd YCSB
-mkdir results
+cd /home/ubuntu/LOG-8430-TP3/Mongo
 
-# Création des dossiers pour la sauvegarde des données
-cd results
-mkdir A
-mkdir B
-mkdir C
-mkdir D
-mkdir E
-mkdir F
-cd ..
+# Creation des folders pour la sauvegarde des résultats
+./folder_results.sh
 
-# Exécution des tests de charges
-for i in {1..3}
-do
-./bin/ycsb load mongodb-async -s -P workloads/workloada -p recordcount=1000 -p mongodb.upsert=true -p mongodb.url=mongodb://primary:27017,secondary1:27017,secondary2:27017,secondary3:27017/?replicaSet=myReplicaSet >> ./results/A/outputLoad.csv
-./bin/ycsb run mongodb-async -s -P workloads/workloada -p recordcount=1000 -p mongodb.upsert=true -p mongodb.url=mongodb://primary:27017,secondary1:27017,secondary2:27017,secondary3:27017/?replicaSet=myReplicaSet >> ./results/A/outputRun.csv
+# Compilation du code pour la génération des charges de travail
+make
 
-./bin/ycsb load mongodb-async -s -P workloads/workloadb -p recordcount=1000 -p mongodb.upsert=true -p mongodb.url=mongodb://primary:27017,secondary1:27017,secondary2:27017,secondary3:27017/?replicaSet=myReplicaSet >> ./results/B/outputLoad.csv
-./bin/ycsb run mongodb-async -s -P workloads/workloadb -p recordcount=1000 -p mongodb.upsert=true -p mongodb.url=mongodb://primary:27017,secondary1:27017,secondary2:27017,secondary3:27017/?replicaSet=myReplicaSet >> ./results/B/outputRun.csv
 
-./bin/ycsb load mongodb-async -s -P workloads/workloadc -p recordcount=1000 -p mongodb.upsert=true -p mongodb.url=mongodb://primary:27017,secondary1:27017,secondary2:27017,secondary3:27017/?replicaSet=myReplicaSet >> ./results/C/outputLoad.csv
-./bin/ycsb run mongodb-async -s -P workloads/workloadc -p recordcount=1000 -p mongodb.upsert=true -p mongodb.url=mongodb://primary:27017,secondary1:27017,secondary2:27017,secondary3:27017/?replicaSet=myReplicaSet >> ./results/C/outputRun.csv
-
-./bin/ycsb load mongodb-async -s -P workloads/workloadd -p recordcount=1000 -p mongodb.upsert=true -p mongodb.url=mongodb://primary:27017,secondary1:27017,secondary2:27017,secondary3:27017/?replicaSet=myReplicaSet >> ./results/D/outputLoad.csv
-./bin/ycsb run mongodb-async -s -P workloads/workloadd -p recordcount=1000 -p mongodb.upsert=true -p mongodb.url=mongodb://primary:27017,secondary1:27017,secondary2:27017,secondary3:27017/?replicaSet=myReplicaSet >> ./results/D/outputRun.csv
-
-./bin/ycsb load mongodb-async -s -P workloads/workloade -p recordcount=1000 -p mongodb.upsert=true -p mongodb.url=mongodb://primary:27017,secondary1:27017,secondary2:27017,secondary3:27017/?replicaSet=myReplicaSet >> ./results/E/outputLoad.csv
-./bin/ycsb run mongodb-async -s -P workloads/workloade -p recordcount=1000 -p mongodb.upsert=true -p mongodb.url=mongodb://primary:27017,secondary1:27017,secondary2:27017,secondary3:27017/?replicaSet=myReplicaSet >> ./results/E/outputRun.csv
-
-./bin/ycsb load mongodb-async -s -P workloads/workloadf -p recordcount=1000 -p mongodb.upsert=true -p mongodb.url=mongodb://primary:27017,secondary1:27017,secondary2:27017,secondary3:27017/?replicaSet=myReplicaSet >> ./results/F/outputLoad.csv
-./bin/ycsb run mongodb-async -s -P workloads/workloadf -p recordcount=1000 -p mongodb.upsert=true -p mongodb.url=mongodb://primary:27017,secondary1:27017,secondary2:27017,secondary3:27017/?replicaSet=myReplicaSet >> ./results/F/outputRun.csv
-done
+# Execution du processus de génération de données
+./process
 ```
 
 # Reset des containers
 Une fois les manipulations réalisées, on peut shutdown la base de données en allant dans le répertoire où se trouve le docker-compose.yml et exécuté la commande suivante
 ```
+# Avant de fermer les containers, on sauvegarde les id de containers
+docker container ls >> /home/results/container.csv
+
 docker-compose down
 ```
+
+# Récuprération des données pour l'analyse
+Pour récupérer les données sauvegardées dans l'instance AWS, il ne suffit que d'utiliser la commande suivante dans le terminal de votre l'ordinateur
+```
+scp -i votre_clef.pem -r ubuntu@ec2-0-0-0-0.compute-1.amazonaws.com:/home/ubuntu/results votre/path/en/local 
+```
+
+# Fichier recceillis 
+## stats.csv
+Fichier contenant les statistiques des containers Docker durant l'execution des workloads ainsi que les timestamp associés à chaque mesure.
+## container.csv
+Fichier contenant les données sur les containers Docker. L'essentiel est d'avoir le ID de container et le nom rattacher à ce dernier, il sera utile pour identifier les containers affichés dans le fichier stats.csv
+## /x/output.csv (où x est a, b ou c)
+Fichier contenant les différentes données recceillis pendant l'exécution workloads. Chaque workload à été exécuté 5 fois et nécessite 2 opérations (Load et Run). Chaque fichier output.csv comprend donc 10 sections de résultats.
 
 
