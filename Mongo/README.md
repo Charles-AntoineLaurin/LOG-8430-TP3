@@ -13,7 +13,7 @@ sudo apt install git -y
 sudo apt install build-essential -y
 
 #install Python
-sudo apt install python2.7
+sudo apt install python2.7 -y
 
 # install Java
 sudo apt install default-jre -y
