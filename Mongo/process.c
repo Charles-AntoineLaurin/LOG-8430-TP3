@@ -15,12 +15,12 @@ char PROCESS[] = {'a', 'b', 'c'};
 int main() {
     int docker_status_pid = fork();
     if (docker_status_pid == 0) {
-            execl("/usr/bin/bash", "bin/bash", "-c", "python /home/ubuntu/LOG-8430-TP3/Mongo/script.py", NULL); // execute le process de docker-stats;
+            execl("/usr/bin/bash", "bin/bash", "-c", "docker stats --format {{.Container}}, {{.CPUPerc}},{{.MemUsage}} >> /home/ubuntu/results/stats.csv", NULL); // execute le process de docker-stats;
     }
 
     // Pour chaque workload
     for (int i = 0; i< 3; i++) {
-            sleep(3);
+            sleep(2);
             for(int j= 0; j< 5; j ++) {
 		char* path = "/home/ubuntu/results/";
                 char filepath[200];
@@ -38,8 +38,9 @@ int main() {
                         sprintf(execCommand, "%s%s%s%c%s", "/home/ubuntu/ycsb-0.17.0/bin/ycsb load ", postfix, ">> /home/ubuntu/results/", PROCESS[i], "/output.csv");
                         execl("/usr/bin/bash", "/bin/bash", "-c", execCommand, NULL);
                 }
+
                 wait(NULL);
-                sleep(3);
+
                 int run_pid = fork();
                 if (run_pid == 0) {
 			char execCommand[600];
@@ -47,8 +48,8 @@ int main() {
 			execl("/usr/bin/bash", "/bin/bash", "-c", execCommand, NULL);
                         
                 }
+
                 wait(NULL);
-                sleep(3);
             }
    }
    kill(docker_status_pid, 1);
